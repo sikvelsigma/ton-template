@@ -1,3 +1,5 @@
+#pragma version >=0.4.0;
+
 #include "common/imports.fc";
 #include "main/imports.fc";	;; replace "main" with an actual folder
 
