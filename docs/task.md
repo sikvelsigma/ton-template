@@ -154,11 +154,18 @@ flowchart LR
 	A2["User<br/>Tracker"]
 	A3[["Vote<br/>Option<br/>1"]]
 
-	A0 --> |op: vote|A1
-	A1 --> |op: check_vote|A2
-	A2 -.-> |op: route_vote|A1
-	A1 --> |op: add_vote|A3
-    A3 -.-> |op: excesses|A0
+	A0 --> |index: 0<br/>op: vote|A1
+	A1 --> |index: 1<br/>op: check_vote|A2
+	A2 -.-> |index: 2<br/>op: route_vote|A1
+	A1 --> |index: 3<br/>op: add_vote|A3
+    A3 -.-> |index: 4<br/>op: excesses|A0
+
+	linkStyle 0 stroke:#ff4747,color:#ff4747
+	linkStyle 1 stroke:#ff4747,color:#ff4747
+	linkStyle 2 stroke:#02dbdb,color:#02dbdb
+	linkStyle 3 stroke:#ff4747,color:#ff4747
+	linkStyle 4 stroke:#0400f0,color:#0400f0
+
 ```
 
 #### change vote
@@ -171,13 +178,21 @@ flowchart LR
 	A3[["Vote<br/>Option<br/>1"]]
 	A4[["Vote<br/>Option<br/>2"]]
 
-	A0 --> |op: vote|A1
-	A1 --> |op: check_vote|A2
-	A2 -.-> |op: route_vote|A1
-	A1 --> |op: remove_vote|A3
-	A1 --> |op: add_vote|A4
-    A3 -.-> |op: excesses|A0
-    A4 -.-> |op: excesses|A0
+	A0 --> |index: 0<br/>op: vote|A1
+	A1 --> |index: 1<br/>op: check_vote|A2
+	A2 -.-> |index: 2<br/>op: route_vote|A1
+	A1 --> |index: 3<br/>op: remove_vote|A3
+	A1 --> |index: 4<br/>op: add_vote|A4
+    A3 -.-> |index: 5<br/>op: excesses|A0
+    A4 -.-> |index: 6<br/>op: excesses|A0
+
+	linkStyle 0 stroke:#ff4747,color:#ff4747
+	linkStyle 1 stroke:#ff4747,color:#ff4747
+	linkStyle 2 stroke:#02dbdb,color:#02dbdb
+	linkStyle 3 stroke:#ff4747,color:#ff4747
+	linkStyle 4 stroke:#ff4747,color:#ff4747
+	linkStyle 5 stroke:#0400f0,color:#0400f0
+	linkStyle 6 stroke:#0400f0,color:#0400f0
 ```
 
 ## Materials

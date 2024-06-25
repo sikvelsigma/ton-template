@@ -1,4 +1,4 @@
-# TT
+# Template
 
 ## Project structure
 
