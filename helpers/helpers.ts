@@ -5,6 +5,7 @@ import { parseErrors, parseOp, stdFtOpCodes, stdNftOpCodes, tvmErrorCodes } from
 import { nftOpcodes } from "./libs/wrappers/NftItem";
 import { jWalletOpcodes } from "./libs/wrappers/JettonWallet";
 import { jMinterOpcodes } from "./libs/wrappers/JettonMinter";
+import { CliConfig, resolvers } from "./libs/config-helpers";
 
 /*
     Use this function to create graphs from local sandbox transactions
@@ -79,3 +80,10 @@ export function createMDGraphLocal(params: {
         // feeDetails: true,
     });
 }
+
+
+// config for working on-chain
+const configParams = {
+    mainAddress: resolvers.address,
+};
+export const cliConfig = new CliConfig(configParams)
