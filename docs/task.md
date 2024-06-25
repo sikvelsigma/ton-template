@@ -201,6 +201,7 @@ flowchart LR
 - FunC [std lib](https://docs.ton.org/develop/func/stdlib)
 - FunC [specification](https://docs.ton.org/develop/func/types)
 - FunC [cookbook](https://docs.ton.org/develop/func/cookbook)
+- FunC [send mods](https://docs.ton.org/develop/smart-contracts/messages#message-modes)
 - [FunC lessons](https://github.com/romanovichim/TonFunClessons_Eng/tree/main/lessons/smartcontract)
 - [some youtube lessons](https://www.youtube.com/watch?v=isfFGmyJvns&list=PLyDBPwv9EPsA5vcUM2vzjQOomf264IdUZ)
 
@@ -237,3 +238,88 @@ flowchart LR
 ## Contract template
 
 You can use [this template](https://github.com/sikvelsigma/ton-template) to start your projects or create basic project template with `npm create ton@latest` command
+
+## Tips 
+
+### Sending msgs
+
+There're several functions to send msgs in `@ston-fi/funcbox`, you can find them in `node_modules/@ston-fi/funcbox/contracts/msgs.fc`
+
+Msgs are sent using different [send modes](https://docs.ton.org/develop/smart-contracts/messages#message-modes) (some of them can be combined):
+
+  - `NORMAL` (0)
+  - `PAID_EXTERNALLY` (1)
+  - `IGNORE_ERRORS` (2)
+  - `BOUNCE_IF_FAIL` (16)
+  - `DESTROY_IF_ZERO` (32)
+  - `CARRY_REMAINING_GAS` (64)
+  - `CARRY_ALL_BALANCE` (128)
+
+Some of them can be combined with a bitwise `or` operation (`|`) since each bit represents a mode:
+
+```func
+int mode = CARRY_ALL_BALANCE | IGNORE_ERRORS; 	;; this is valid send_mode that will carry all balance (if no reserve command) and won't throw error on failure
+```
+
+### Working with dictionary
+
+You can use dict utils from `@ston-fi/funcbox` at `node_modules/@ston-fi/funcbox/contracts/dict.fc` but they are pretty complex.
+
+You can start by using functions from [stdlib](https://docs.ton.org/develop/func/stdlib#dictionaries-primitives)
+
+### Working with child contracts
+
+#### Create function that returns init storage 
+
+This function depends on the `user_address` and since contract address depends on contract code and `state_init` each user will have a unique `Tracker` contract
+
+```func
+(cell) tracker_ctr(slice _user_address, slice _clicker_address) inline {
+    return begin_cell()
+        .store_slice(_user_address) 		;; address of the user that is tracked
+        .store_slice(_clicker_address)		;; parent contract
+        .store_uint32(0) 					;; id of vote_option
+    .end_cell();
+}
+```
+#### Send msg to child contract with `state_init`
+
+```func
+...
+	var tracker = contracts::from_sources(
+		tracker_ctr(ctx.at(SENDER), my_address()),
+		storage::tracker_code
+	);
+
+	var msg = begin_message(internal_vote)
+		.store_uint(vote_id, 32)
+		.end_cell();
+
+	msgs::send_with_stateinit(
+		0, 										;; ton value (in addition to whatever send_mode you're using)
+		tracker~address(params::workchain), 	;; child ctr address
+		tracker~state_init(), 					;; contract state_init
+		msg, 									;; msg cell
+		CARRY_REMAINING_GAS						;; send mode
+	);
+
+...
+```
+
+#### Verify a call came from child contract
+
+In order to verify a call came from a child contract you need to construct the same `tracker` using incoming data and check this condition:
+
+```func
+...
+	slice user_address = in_msg_body~load_msg_addr();  ;; read user address from incoming msg since it defines state_init
+
+	var tracker = contracts::from_sources(
+		tracker_ctr(user_address, my_address()),
+		storage::tracker_code
+	);
+
+	;; check if the call came from the address of the tracker contract that is defined for this user
+	throw_unless(error::invalid_caller, ctx.at(SENDER).equal_slices(tracker~address(params::workchain)));
+...
+```
