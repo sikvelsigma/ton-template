@@ -267,6 +267,42 @@ You can use dict utils from `@ston-fi/funcbox` at `node_modules/@ston-fi/funcbox
 
 You can start by using functions from [stdlib](https://docs.ton.org/develop/func/stdlib#dictionaries-primitives)
 
+### Using address as dictionary key
+
+In order to use address as key in dictionary we need to use its 256-bit hashpart. [More about addresses](https://docs.ton.org/learn/overviews/addresses)
+
+```func
+...
+	slice account = in_msg_body~load_msg_addr();	;; read incoming address from msg
+
+	;; the value in dict is slice, so if you want to put an actual number here you need to create a slice with it
+	storage::accounts~udict_set(256, account.address::get_hashpart(), empty_slice());
+...
+```
+
+In the wrapper in order to parse dict into a readable map of addresses you can use this snippet
+
+```ts
+import { parseDict } from "@ton/core/dist/dict/parseDict";
+...
+ 	let accountsRaw = result.stack.readCellOpt()	// read raw cell from contract getter
+	const addressList: Address[] = []
+
+	if (accountsRaw !== null) {
+		const addrMap = parseDict(accountsRaw.beginParse(), 256, (slice) => {
+			// here we should parse slice that contains data for each entry for each dict
+			// but our slice is empty so we just return 0
+			return 0
+		});
+		for (let k of addrMap.keys()) {
+			// create address from hashpart
+			addressList.push(rawNumberToAddress(k))
+		}
+
+	}
+...
+```
+
 ### Working with child contracts
 
 #### Create function that returns init storage 
