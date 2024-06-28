@@ -310,7 +310,7 @@ import { parseDict } from "@ton/core/dist/dict/parseDict";
 This function depends on the `user_address` and since contract address depends on contract code and `state_init` each user will have a unique `Tracker` contract
 
 ```func
-(cell) tracker_ctr(slice _user_address, slice _clicker_address) inline {
+(cell) tracker_data(slice _user_address, slice _clicker_address) inline {
     return begin_cell()
         .store_slice(_user_address) 		;; address of the user that is tracked
         .store_slice(_clicker_address)		;; parent contract
@@ -323,7 +323,7 @@ This function depends on the `user_address` and since contract address depends o
 ```func
 ...
 	var tracker = contracts::from_sources(
-		tracker_ctr(ctx.at(SENDER), my_address()),
+		tracker_data(ctx.at(SENDER), my_address()),
 		storage::tracker_code
 	);
 
@@ -351,7 +351,7 @@ In order to verify a call came from a child contract you need to construct the s
 	slice user_address = in_msg_body~load_msg_addr();  ;; read user address from incoming msg since it defines state_init
 
 	var tracker = contracts::from_sources(
-		tracker_ctr(user_address, my_address()),
+		tracker_data(user_address, my_address()),
 		storage::tracker_code
 	);
 
