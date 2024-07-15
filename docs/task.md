@@ -1,4 +1,4 @@
-# Ton blockchain tasks
+# TON blockchain tasks
 
 ## Task 1
 
