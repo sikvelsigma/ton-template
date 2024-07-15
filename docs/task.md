@@ -202,7 +202,7 @@ flowchart LR
 - FunC [specification](https://docs.ton.org/develop/func/types)
 - FunC [cookbook](https://docs.ton.org/develop/func/cookbook)
 - FunC [send mods](https://docs.ton.org/develop/smart-contracts/messages#message-modes)
-- [FunC lessons](https://github.com/romanovichim/TonFunClessons_Eng/tree/main/lessons/smartcontract)
+- FunC [lessons](https://github.com/romanovichim/TonFunClessons_Eng/tree/main/lessons/smartcontract)
 - [some youtube lessons](https://www.youtube.com/watch?v=isfFGmyJvns&list=PLyDBPwv9EPsA5vcUM2vzjQOomf264IdUZ)
 
 ## Notes
@@ -297,6 +297,27 @@ import { parseDict } from "@ton/core/dist/dict/parseDict";
 		for (let k of addrMap.keys()) {
 			// create address from hashpart
 			addressList.push(rawNumberToAddress(k))
+		}
+
+	}
+...
+```
+
+Or you can use in-build dict utils if you have simple value (like `uint8`) in slice that doesn't require custom parsing:
+
+```ts
+import { Dictionary } from '@ton/core';
+...
+ 	let accountsRaw = result.stack.readCellOpt()	// read raw cell from contract getter
+	const addressList: Address[] = []
+
+	if (accountsRaw !== null) {
+		// this will only work if we have uint8 value as slice in dict for each entry
+		let accountsDict = Dictionary.loadDirect(Dictionary.Keys.BigUint(256), Dictionary.Values.Uint(8), accountsRaw)
+
+		for (let entry of accountsDict) {
+			// create address from hashpart
+			addressList.push(rawNumberToAddress(entry[0]))
 		}
 
 	}
